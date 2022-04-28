@@ -77,7 +77,7 @@ final class AuthenticationCoordinator: NSObject, AuthenticationCoordinatorProtoc
     func start() {
         Task {
             do {
-                let flow: AuthenticationFlow = initialScreen == .login ? .login : .registration
+                let flow: AuthenticationFlow = initialScreen == .login ? .login : .register
                 try await authenticationService.startFlow(flow, for: authenticationService.state.homeserver.address)
             } catch {
                 await MainActor.run { displayError(error) }
@@ -195,8 +195,8 @@ final class AuthenticationCoordinator: NSObject, AuthenticationCoordinatorProtoc
             showServerSelectionScreen()
         case .flowResponse(let flowResult):
             showNextScreen(for: flowResult)
-        case .sessionCreated(let session, let isAccountCreated):
-            onSessionCreated(session: session, isAccountCreated: isAccountCreated)
+        case .sessionCreated(let session, let flow):
+            onSessionCreated(session: session, flow: flow)
         }
     }
     
@@ -213,7 +213,7 @@ final class AuthenticationCoordinator: NSObject, AuthenticationCoordinatorProtoc
     }
     
     /// Handles the creation of a new session following on from a successful authentication.
-    func onSessionCreated(session: MXSession, isAccountCreated: Bool) {
+    func onSessionCreated(session: MXSession, flow: AuthenticationFlow) {
         registerSessionStateChangeNotification(for: session)
         
         self.session = session
@@ -223,7 +223,8 @@ final class AuthenticationCoordinator: NSObject, AuthenticationCoordinatorProtoc
             showLoadingAnimation()
         }
         
-        completion?(.didLogin(session: session, authenticationType: isAccountCreated ? .register : .login))
+        #warning("Add authentication type to the new flow")
+        completion?(.didLogin(session: session, authenticationFlow: flow, authenticationType: .other))
     }
     
     // MARK: - Additional Screens
@@ -395,7 +396,7 @@ extension AuthenticationCoordinator {
         set { /* no-op */ }
     }
     
-    func update(authenticationType: MXKAuthenticationType) {
+    func update(authenticationFlow: AuthenticationFlow) {
         // unused
     }
     

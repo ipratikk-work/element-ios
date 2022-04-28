@@ -43,7 +43,7 @@ protocol RegistrationFlowHandling {
                 
                 switch result {
                 case .success(let mxSession):
-                    completion?(.sessionCreated(session: mxSession, isAccountCreated: true))
+                    completion?(.sessionCreated(session: mxSession, flow: .register))
                 case .flowResponse(let flowResult):
                     await processFlowResponse(flowResult: flowResult)
                 }

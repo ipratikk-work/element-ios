@@ -34,7 +34,7 @@ enum AuthenticationRegistrationCoordinatorResult {
     /// The screen completed but there are remaining authentication steps.
     case flowResponse(FlowResult)
     /// The screen completed with a successful login.
-    case sessionCreated(session: MXSession, isAccountCreated: Bool)
+    case sessionCreated(session: MXSession, flow: AuthenticationFlow)
 }
 
 @available(iOS 14.0, *)
